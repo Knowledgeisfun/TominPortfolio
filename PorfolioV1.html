@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Tomin James</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Space Grotesk & Source Serif Pro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Define custom fonts and colors from the design system */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Source Serif Pro', serif;
+            background-color: #0F172A; /* Midnight Navy */
+            color: #E2E8F0; /* Cool Gray */
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-space-grotesk {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .accent-cyan {
+            color: #22D3EE;
+        }
+        
+        .bg-accent-cyan {
+            background-color: #22D3EE;
+        }
+
+        .border-accent-cyan {
+            border-color: #22D3EE;
+        }
+        
+        /* Bento Grid Layout */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            grid-auto-rows: 300px;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .bento-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-auto-rows: 250px;
+            }
+        }
+
+        .bento-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            background-color: #1E293B; /* Slate 800 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bento-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        @media (min-width: 768px) {
+            .md\:col-span-2 { grid-column: span 2 / span 2; }
+            .md\:row-span-2 { grid-row: span 2 / span 2; }
+        }
+        
+        .item-content { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .bento-item:hover .item-content { transform: scale(1.05); }
+
+        .item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.8), transparent);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .item-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #FFFFFF; font-size: 1.25rem; line-height: 1.2; }
+        .item-category { font-family: 'Space Grotesk', sans-serif; color: #22D3EE; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+        
+        /* Filter button styling */
+        .filter-btn { background-color: transparent; border: 1px solid #334155; color: #94A3B8; padding: 0.5rem 1rem; border-radius: 9999px; transition: all 0.2s ease; }
+        .filter-btn:hover { background-color: #334155; color: #FFFFFF; }
+        .filter-btn.active { background-color: #22D3EE; color: #0F172A; border-color: #22D3EE; }
+
+        /* Project Deep Dive & About Page Styling */
+        .prose-custom { color: #94A3B8; }
+        .prose-custom h2, .prose-custom h3, .prose-custom h4 { color: #E2E8F0; font-family: 'Space Grotesk', sans-serif; }
+        .prose-custom p { line-height: 1.8; margin-bottom: 1.5rem; }
+        .prose-custom strong { color: #E2E8F0; }
+
+        /* Skills Bar */
+        .skill-bar-bg { background-color: #1E293B; border-radius: 9999px; overflow: hidden; }
+        .skill-bar-fg { background-color: #22D3EE; height: 100%; border-radius: 9999px; width: 0; /* Start at 0 width */ transition: width 1s ease-in-out; }
+
+        /* Scroll-triggered animation setup */
+        .fade-in-up { 
+            opacity: 0; 
+            transform: translateY(30px); 
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+        }
+        
+        /* Apply animation to children when parent container is visible */
+        .anim-container.is-visible .fade-in-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .grain-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; pointer-events: none; background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>'); opacity: 0.03; z-index: -1; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="grain-overlay"></div>
+
+    <!-- Header -->
+    <header class="w-full p-6 z-10 bg-gradient-to-b from-[#0F172A] to-transparent sticky top-0">
+        <nav class="flex justify-between items-center max-w-7xl mx-auto">
+            <div>
+                <a href="#" class="font-space-grotesk text-xl font-bold text-white">TOMIN JAMES</a>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#about-me" class="text-sm text-gray-300 hover:text-white transition-colors">About</a>
+                <a href="#work" class="text-sm text-gray-300 hover:text-white transition-colors">Work</a>
+                <a href="#" class="text-sm text-gray-300 hover:text-white transition-colors">Contact</a>
+            </div>
+            <div class="md:hidden">
+                <button class="text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto p-6">
+        
+        <!-- =================================== -->
+        <!-- NEW SECTION 1: ABOUT ME -->
+        <!-- =================================== -->
+        <section id="about-me" class="mb-32 pt-12 md:pt-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Column: Photo -->
+                <div class="anim-container">
+                    <img src="TominJames.jpg" alt="A professional portrait of Tomin James" class="rounded-lg w-full h-auto object-cover shadow-2xl fade-in-up" onerror="this.onerror=null;this.src='https://placehold.co/800x1000/1E293B/E2E8F0?text=Tomin+James';">
+                </div>
+                <!-- Right Column: Bio & Intro -->
+                <div class="anim-container prose-custom">
+                    <h1 class="font-space-grotesk text-5xl md:text-7xl font-bold text-white tracking-tighter mb-6 fade-in-up">TOMIN JAMES</h1>
+                    <p class="text-xl text-slate-300 fade-in-up" style="transition-delay: 0.1s;">I am a multidisciplinary creative director specializing in visual media. My work explores the intersection of raw human expression and polished technical precision. I believe the most powerful stories are told when artistry and technology converge.</p>
+                    <p class="text-slate-400 fade-in-up" style="transition-delay: 0.2s;">From crafting garment collections to directing cinematic shorts, my focus is on building immersive worlds that resonate. This portfolio is a curated look into my process and passion across fashion, photography, and film.</p>
+                </div>
+            </div>
+
+            <!-- Skills, Education & Certs Sub-section -->
+            <div class="mt-24 md:mt-32 grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-16">
+                <!-- Left Column: Skills -->
+                <div class="md:col-span-2 anim-container">
+                     <h3 class="text-3xl font-bold mb-6 fade-in-up font-space-grotesk text-white">Toolkit & Skills</h3>
+                     <div class="space-y-4 fade-in-up" style="transition-delay: 0.2s;">
+                         <!-- Skill 1 -->
+                         <div>
+                             <p class="flex justify-between items-center mb-1"><strong>Adobe Photoshop</strong><span>Expert</span></p>
+                             <div class="skill-bar-bg h-2 w-full"><div class="skill-bar-fg" data-width="95%"></div></div>
+                         </div>
+                         <!-- Skill 2 -->
+                         <div>
+                             <p class="flex justify-between items-center mb-1"><strong>DaVinci Resolve</strong><span>Advanced</span></p>
+                             <div class="skill-bar-bg h-2 w-full"><div class="skill-bar-fg" data-width="85%"></div></div>
+                         </div>
+                         <!-- Skill 3 -->
+                         <div>
+                             <p class="flex justify-between items-center mb-1"><strong>Pattern Drafting</strong><span>Advanced</span></p>
+                             <div class="skill-bar-bg h-2 w-full"><div class="skill-bar-fg" data-width="90%"></div></div>
+                         </div>
+                         <!-- Skill 4 -->
+                         <div>
+                            <p class="flex justify-between items-center mb-1"><strong>Commercial Lighting</strong><span>Expert</span></p>
+                            <div class="skill-bar-bg h-2 w-full"><div class="skill-bar-fg" data-width="95%"></div></div>
+                        </div>
+                         <!-- Skill 5 -->
+                         <div>
+                             <p class="flex justify-between items-center mb-1"><strong>Webflow</strong><span>Proficient</span></p>
+                             <div class="skill-bar-bg h-2 w-full"><div class="skill-bar-fg" data-width="75%"></div></div>
+                         </div>
+                     </div>
+                </div>
+                <!-- Right Column: Education & Certs -->
+                <div class="md:col-span-3 anim-container">
+                    <h3 class="text-3xl font-bold mb-8 fade-in-up font-space-grotesk text-white">Education & Certifications</h3>
+                    <div class="border-l-2 border-slate-700 pl-6 space-y-10 fade-in-up" style="transition-delay: 0.3s;">
+                        <!-- Education Item -->
+                        <div>
+                            <h4 class="text-xl font-bold text-white">Bachelor of Design (Fashion Design)</h4>
+                            <p class="text-accent-cyan text-sm">National Institute of Fashion Technology (NIFT), 2020</p>
+                            <p class="mb-0 mt-2 text-slate-400">Focused on the integration of sustainable materials and digital fabrication techniques in modern apparel.</p>
+                        </div>
+                        <!-- Certification Item -->
+                        <div>
+                            <h4 class="text-xl font-bold text-white">Certified Professional Photographer (CPP)</h4>
+                            <p class="text-accent-cyan text-sm">Professional Photographers of America, 2022</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                <img src="https://placehold.co/400x250/1E293B/E2E8F0?text=CPP+Certificate" alt="CPP Certificate" class="rounded-md bg-slate-800 hover:opacity-75 transition-opacity cursor-pointer">
+                                <img src="https://placehold.co/400x250/1E293B/E2E8F0?text=Advanced+Lighting" alt="Advanced Lighting Certificate" class="rounded-md bg-slate-800 hover:opacity-75 transition-opacity cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================== -->
+        <!-- SECTION 2: MAIN PORTFOLIO (WORK) -->
+        <!-- =================================== -->
+        <section id="work" class="mb-32 pt-16">
+            <div class="my-8">
+                <h2 class="font-space-grotesk text-5xl md:text-7xl font-bold text-white tracking-tighter">Selected Work</h2>
+            </div>
+
+            <div class="flex flex-wrap gap-2 my-8" id="filter-controls">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="fashion">Fashion</button>
+                <button class="filter-btn" data-filter="photo">Photography</button>
+                <button class="filter-btn" data-filter="video">Video</button>
+            </div>
+
+            <div class="bento-grid" id="portfolio-grid">
+                <a href="#project-fashion" class="bento-item md:col-span-2 md:row-span-2 group" data-category="fashion">
+                    <img src="https://images.pexels.com/photos/322207/pexels-photo-322207.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="AURA Collection Lookbook" class="item-content" onerror="this.onerror=null;this.src='https://placehold.co/800x800/1E293B/E2E8F0?text=Fashion';">
+                    <div class="item-overlay"><h3 class="item-title">AURA Collection</h3><p class="item-category">Fashion Design</p></div>
+                </a>
+                <a href="#project-photo" class="bento-item md:row-span-2 group" data-category="photo">
+                    <img src="https://images.pexels.com/photos/3772510/pexels-photo-3772510.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Urban Portraits" class="item-content" onerror="this.onerror=null;this.src='https://placehold.co/400x800/1E293B/E2E8F0?text=Photo';">
+                    <div class="item-overlay"><h3 class="item-title">Urban Portraits</h3><p class="item-category">Photography</p></div>
+                </a>
+                <a href="#project-video" class="bento-item md:col-span-2 group" data-category="video">
+                    <img src="https://images.pexels.com/photos/1535907/pexels-photo-1535907.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Kinetic Title Sequence" class="item-content" onerror="this.onerror=null;this.src='https://placehold.co/800x400/1E293B/E2E8F0?text=Video';">
+                    <div class="item-overlay"><h3 class="item-title">Kinetic Titles</h3><p class="item-category">Motion Design</p></div>
+                </a>
+                <a href="#" class="bento-item group" data-category="fashion">
+                    <img src="https://images.pexels.com/photos/1484516/pexels-photo-1484516.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Initial sketch for a dress" class="item-content" onerror="this.onerror=null;this.src='https://placehold.co/400x400/1E293B/E2E8F0?text=Sketch';">
+                    <div class="item-overlay"><h3 class="item-title">Concept Sketch</h3><p class="item-category">Process</p></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- =================================== -->
+        <!-- SECTION 3: PROJECT DEEP DIVES -->
+        <!-- =================================== -->
+        <section id="deep-dives">
+            
+            <!-- FASHION PROJECT -->
+            <article id="project-fashion" class="mb-32 pt-16 anim-container">
+                <div class="max-w-5xl mx-auto">
+                    <div class="w-full h-[60vh] md:h-[80vh] rounded-lg overflow-hidden relative mb-16 fade-in-up">
+                        <img src="https://images.pexels.com/photos/322207/pexels-photo-322207.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="AURA Collection main look" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1200x800/1E293B/E2E8F0?text=Hero+Image';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 fade-in-up">
+                        <div class="md:col-span-2"><h2 class="font-space-grotesk text-5xl md:text-7xl font-bold text-white tracking-tighter">AURA Collection</h2></div>
+                        <div class="text-sm text-slate-400 space-y-4 border-l border-slate-700 pl-6"><p><strong>DISCIPLINE:</strong> Fashion Design</p><p><strong>ROLE:</strong> Creative Director</p><p><strong>GOAL:</strong> To create a lookbook exploring ethereal light and shadow.</p></div>
+                    </div>
+                    <div class="max-w-3xl mx-auto prose-custom fade-in-up">
+                        <h3 class="text-3xl font-bold mb-6">The Inspiration</h3><p>The AURA collection began with a fascination for the transient nature of light. The core challenge was to translate this intangible concept into tangible garments that felt both structured and weightless.</p>
+                        <div class="my-16"><img src="https://images.pexels.com/photos/833052/pexels-photo-833052.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Fabric swatches" class="rounded-lg w-full" onerror="this.onerror=null;this.src='https://placehold.co/800x500/1E293B/E2E8F0?text=Moodboard';"></div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- PHOTOGRAPHY PROJECT -->
+            <article id="project-photo" class="mb-32 pt-16 anim-container">
+                <div class="max-w-5xl mx-auto">
+                    <div class="w-full h-[60vh] md:h-[80vh] rounded-lg overflow-hidden relative mb-16 fade-in-up">
+                        <img src="https://images.pexels.com/photos/3772510/pexels-photo-3772510.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Urban Portraits main look" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1200x800/1E293B/E2E8F0?text=Hero+Image';">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 fade-in-up">
+                        <div class="md:col-span-2"><h2 class="font-space-grotesk text-5xl md:text-7xl font-bold text-white tracking-tighter">Urban Portraits</h2></div>
+                        <div class="text-sm text-slate-400 space-y-4 border-l border-slate-700 pl-6"><p><strong>DISCIPLINE:</strong> Photography</p><p><strong>ROLE:</strong> Lead Photographer</p><p><strong>GOAL:</strong> To capture the authentic character of the city through its people.</p></div>
+                    </div>
+                    <div class="max-w-3xl mx-auto prose-custom fade-in-up">
+                        <h3 class="text-3xl font-bold mb-6">The Vision</h3><p>This series aimed to move beyond posed shots and capture candid, authentic moments. The city itself became a secondary character, its textures and light framing the subjects' stories.</p>
+                        <div class="my-16"><img src="https://images.pexels.com/photos/1102341/pexels-photo-1102341.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Cityscape" class="rounded-lg w-full" onerror="this.onerror=null;this.src='https://placehold.co/800x500/1E293B/E2E8F0?text=Location';"></div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- VIDEOGRAPHY PROJECT -->
+            <article id="project-video" class="mb-32 pt-16 anim-container">
+                <div class="max-w-5xl mx-auto">
+                    <div class="w-full h-[60vh] md:h-[80vh] rounded-lg overflow-hidden relative mb-16 bg-slate-900 flex items-center justify-center fade-in-up">
+                        <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-video-of-a-man-with-a-special-effect-4913-large.mp4" type="video/mp4">
+                        </video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 fade-in-up">
+                        <div class="md:col-span-2"><h2 class="font-space-grotesk text-5xl md:text-7xl font-bold text-white tracking-tighter">Kinetic Titles</h2></div>
+                        <div class="text-sm text-slate-400 space-y-4 border-l border-slate-700 pl-6"><p><strong>DISCIPLINE:</strong> Videography / Motion</p><p><strong>ROLE:</strong> Director & Animator</p><p><strong>GOAL:</strong> To design a high-energy title sequence for a fictional tech conference.</p></div>
+                    </div>
+                    <div class="max-w-3xl mx-auto prose-custom fade-in-up">
+                        <h3 class="text-3xl font-bold mb-6">The Concept</h3><p>The goal was to create a visual identity in motion that felt both futuristic and human. Using a combination of fast-paced typography, abstract shapes, and glitch effects, the sequence builds energy and excitement.</p>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full p-8 mt-16 text-center border-t border-slate-800">
+        <p class="text-xs text-gray-500">&copy; 2025 Tomin James. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Bento Grid Filtering Logic
+            const filterControls = document.getElementById('filter-controls');
+            if (filterControls) {
+                const portfolioItems = document.querySelectorAll('#portfolio-grid .bento-item');
+                const filterButtons = filterControls.querySelectorAll('.filter-btn');
+
+                filterControls.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'BUTTON') return;
+                    const filterValue = e.target.getAttribute('data-filter');
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    portfolioItems.forEach(item => {
+                        const itemCategory = item.getAttribute('data-category');
+                        if (filterValue === 'all' || filterValue === itemCategory) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Scroll-triggered Animation Logic
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Add 'is-visible' to the container to trigger animations
+                        entry.target.classList.add('is-visible');
+                        
+                        // Animate skill bars within the visible container
+                        const skillBars = entry.target.querySelectorAll('.skill-bar-fg');
+                        skillBars.forEach(bar => {
+                            const targetWidth = bar.getAttribute('data-width');
+                            bar.style.width = targetWidth;
+                        });
+                    } else {
+                        // Remove 'is-visible' to reset the animation when scrolling out of view
+                        entry.target.classList.remove('is-visible');
+
+                        // Reset skill bars when scrolling out of view
+                        const skillBars = entry.target.querySelectorAll('.skill-bar-fg');
+                        skillBars.forEach(bar => {
+                            bar.style.width = '0%';
+                        });
+                    }
+                });
+            }, {
+                threshold: 0.1 // Trigger when 10% of the element is visible
+            });
+            
+            document.querySelectorAll('.anim-container').forEach(el => observer.observe(el));
+        });
+    </script>
+
+</body>
+</html>
