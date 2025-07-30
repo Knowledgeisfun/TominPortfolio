@@ -15,6 +15,11 @@
 
     <style>
         /* Define custom fonts and colors from the design system */
+        :root {
+            --x: 50vw;
+            --y: 50vh;
+        }
+
         html {
             scroll-behavior: smooth;
         }
@@ -22,6 +27,13 @@
             font-family: 'Source Serif Pro', serif;
             background-color: #0F172A; /* Midnight Navy */
             color: #E2E8F0; /* Cool Gray */
+            cursor: none; /* Hide the default cursor */
+            /* Spotlight background effect */
+            background-image: radial-gradient(
+                circle 600px at var(--x) var(--y),
+                rgba(34, 211, 238, 0.08),
+                transparent 80%
+            );
         }
 
         h1, h2, h3, h4, h5, h6, .font-space-grotesk {
@@ -60,12 +72,15 @@
             overflow: hidden;
             border-radius: 0.75rem;
             background-color: #1E293B; /* Slate 800 */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid transparent; /* Prepare for glowing border */
         }
 
+        /* Glowing border hover effect */
         .bento-item:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3), 0 0 40px rgba(34, 211, 238, 0.2);
+            border-color: rgba(34, 211, 238, 0.5);
         }
 
         @media (min-width: 768px) {
@@ -111,43 +126,123 @@
             transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
         }
         
-        /* Apply animation to children when parent container is visible */
         .anim-container.is-visible .fade-in-up {
             opacity: 1;
             transform: translateY(0);
         }
         
         .grain-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; pointer-events: none; background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>'); opacity: 0.03; z-index: -1; }
+
+        /* Custom Cursor Styling */
+        .cursor-dot {
+            pointer-events: none;
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #22D3EE;
+            border-radius: 50%;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s ease-out, background-color 0.2s ease-out;
+        }
+        .cursor-dot.grow {
+            transform: translate(-50%, -50%) scale(5);
+            background-color: rgba(34, 211, 238, 0.25);
+        }
+
+        /* Hide custom cursor on touch devices */
+        @media (pointer: coarse) {
+            .cursor-dot {
+                display: none;
+            }
+            body {
+                cursor: auto;
+            }
+        }
+
+        /* Certificate Modal Styling */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+        }
+
+        /* Universal Glowing Border Effect */
+        .glow-on-hover {
+            border: 1px solid transparent;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glow-on-hover:hover {
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), 0 0 30px rgba(34, 211, 238, 0.15);
+            border-color: rgba(34, 211, 238, 0.4);
+        }
+
     </style>
 </head>
 <body class="antialiased">
 
+    <div class="cursor-dot"></div>
     <div class="grain-overlay"></div>
 
     <!-- Header -->
-    <header class="w-full p-6 z-10 bg-gradient-to-b from-[#0F172A] to-transparent sticky top-0">
+    <header class="w-full p-6 z-50 bg-slate-900/50 backdrop-blur-sm sticky top-0">
         <nav class="flex justify-between items-center max-w-7xl mx-auto">
             <div>
                 <a href="#" class="font-space-grotesk text-xl font-bold text-white">TOMIN JAMES</a>
             </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#about-me" class="text-sm text-gray-300 hover:text-white transition-colors">About</a>
-                <a href="#work" class="text-sm text-gray-300 hover:text-white transition-colors">Work</a>
-                <a href="#" class="text-sm text-gray-300 hover:text-white transition-colors">Contact</a>
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-2">
+                <a href="#about-me" class="text-sm text-gray-300 hover:text-white transition-colors glow-on-hover rounded-md px-3 py-2">About</a>
+                <a href="#work" class="text-sm text-gray-300 hover:text-white transition-colors glow-on-hover rounded-md px-3 py-2">Work</a>
+                <a href="#" class="text-sm text-gray-300 hover:text-white transition-colors glow-on-hover rounded-md px-3 py-2">Contact</a>
             </div>
+            <!-- Mobile Menu Button -->
             <div class="md:hidden">
-                <button class="text-white">
+                <button id="mobile-menu-btn" class="text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </nav>
+         <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4">
+            <a href="#about-me" class="block py-2 text-sm text-gray-300 hover:text-white">About</a>
+            <a href="#work" class="block py-2 text-sm text-gray-300 hover:text-white">Work</a>
+            <a href="#" class="block py-2 text-sm text-gray-300 hover:text-white">Contact</a>
+        </div>
     </header>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto p-6">
         
         <!-- =================================== -->
-        <!-- NEW SECTION 1: ABOUT ME -->
+        <!-- SECTION 1: ABOUT ME -->
         <!-- =================================== -->
         <section id="about-me" class="mb-32 pt-12 md:pt-24">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -210,9 +305,9 @@
                         <div>
                             <h4 class="text-xl font-bold text-white">Certified Professional Photographer (CPP)</h4>
                             <p class="text-accent-cyan text-sm">Professional Photographers of America, 2022</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                                <img src="https://placehold.co/400x250/1E293B/E2E8F0?text=CPP+Certificate" alt="CPP Certificate" class="rounded-md bg-slate-800 hover:opacity-75 transition-opacity cursor-pointer">
-                                <img src="https://placehold.co/400x250/1E293B/E2E8F0?text=Advanced+Lighting" alt="Advanced Lighting Certificate" class="rounded-md bg-slate-800 hover:opacity-75 transition-opacity cursor-pointer">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4" id="certificate-gallery">
+                                <img src="https://images.pexels.com/photos/7129631/pexels-photo-7129631.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="CPP Certificate" class="rounded-md bg-slate-800 transition-opacity cursor-pointer glow-on-hover">
+                                <img src="https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Advanced Lighting Certificate" class="rounded-md bg-slate-800 transition-opacity cursor-pointer glow-on-hover">
                             </div>
                         </div>
                     </div>
@@ -229,10 +324,10 @@
             </div>
 
             <div class="flex flex-wrap gap-2 my-8" id="filter-controls">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="fashion">Fashion</button>
-                <button class="filter-btn" data-filter="photo">Photography</button>
-                <button class="filter-btn" data-filter="video">Video</button>
+                <button class="filter-btn active glow-on-hover" data-filter="all">All</button>
+                <button class="filter-btn glow-on-hover" data-filter="fashion">Fashion</button>
+                <button class="filter-btn glow-on-hover" data-filter="photo">Photography</button>
+                <button class="filter-btn glow-on-hover" data-filter="video">Video</button>
             </div>
 
             <div class="bento-grid" id="portfolio-grid">
@@ -261,7 +356,7 @@
         <section id="deep-dives">
             
             <!-- FASHION PROJECT -->
-            <article id="project-fashion" class="mb-32 pt-16 anim-container">
+            <article id="project-fashion" class="mb-32 pt-16 anim-container" data-category="fashion">
                 <div class="max-w-5xl mx-auto">
                     <div class="w-full h-[60vh] md:h-[80vh] rounded-lg overflow-hidden relative mb-16 fade-in-up">
                         <img src="https://images.pexels.com/photos/322207/pexels-photo-322207.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="AURA Collection main look" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1200x800/1E293B/E2E8F0?text=Hero+Image';">
@@ -279,7 +374,7 @@
             </article>
 
             <!-- PHOTOGRAPHY PROJECT -->
-            <article id="project-photo" class="mb-32 pt-16 anim-container">
+            <article id="project-photo" class="mb-32 pt-16 anim-container" data-category="photo">
                 <div class="max-w-5xl mx-auto">
                     <div class="w-full h-[60vh] md:h-[80vh] rounded-lg overflow-hidden relative mb-16 fade-in-up">
                         <img src="https://images.pexels.com/photos/3772510/pexels-photo-3772510.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Urban Portraits main look" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1200x800/1E293B/E2E8F0?text=Hero+Image';">
@@ -297,7 +392,7 @@
             </article>
 
             <!-- VIDEOGRAPHY PROJECT -->
-            <article id="project-video" class="mb-32 pt-16 anim-container">
+            <article id="project-video" class="mb-32 pt-16 anim-container" data-category="video">
                 <div class="max-w-5xl mx-auto">
                     <div class="w-full h-[60vh] md:h-[80vh] rounded-lg overflow-hidden relative mb-16 bg-slate-900 flex items-center justify-center fade-in-up">
                         <video class="w-full h-full object-cover" autoplay loop muted playsinline>
@@ -319,6 +414,16 @@
 
     </main>
 
+    <!-- Certificate Modal -->
+    <div id="modal-container" class="modal-overlay">
+        <div class="modal-content">
+            <img id="modal-image" src="" alt="Certificate" class="rounded-lg max-w-full max-h-full">
+        </div>
+        <div id="modal-close-btn" class="modal-close cursor-pointer">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="w-full p-8 mt-16 text-center border-t border-slate-800">
         <p class="text-xs text-gray-500">&copy; 2025 Tomin James. All Rights Reserved.</p>
@@ -326,23 +431,45 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Bento Grid Filtering Logic
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+
+            // Bento Grid & Project Article Filtering Logic
             const filterControls = document.getElementById('filter-controls');
             if (filterControls) {
                 const portfolioItems = document.querySelectorAll('#portfolio-grid .bento-item');
+                const projectArticles = document.querySelectorAll('#deep-dives article');
                 const filterButtons = filterControls.querySelectorAll('.filter-btn');
 
                 filterControls.addEventListener('click', (e) => {
                     if (e.target.tagName !== 'BUTTON') return;
                     const filterValue = e.target.getAttribute('data-filter');
+                    
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
+
+                    // Filter Bento Grid
                     portfolioItems.forEach(item => {
                         const itemCategory = item.getAttribute('data-category');
                         if (filterValue === 'all' || filterValue === itemCategory) {
                             item.style.display = 'block';
                         } else {
                             item.style.display = 'none';
+                        }
+                    });
+
+                    // Filter Project Articles
+                    projectArticles.forEach(article => {
+                        const articleCategory = article.getAttribute('data-category');
+                         if (filterValue === 'all' || filterValue === articleCategory) {
+                            article.style.display = 'block';
+                        } else {
+                            article.style.display = 'none';
                         }
                     });
                 });
@@ -352,20 +479,13 @@
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        // Add 'is-visible' to the container to trigger animations
                         entry.target.classList.add('is-visible');
-                        
-                        // Animate skill bars within the visible container
                         const skillBars = entry.target.querySelectorAll('.skill-bar-fg');
                         skillBars.forEach(bar => {
-                            const targetWidth = bar.getAttribute('data-width');
-                            bar.style.width = targetWidth;
+                            bar.style.width = bar.getAttribute('data-width');
                         });
                     } else {
-                        // Remove 'is-visible' to reset the animation when scrolling out of view
                         entry.target.classList.remove('is-visible');
-
-                        // Reset skill bars when scrolling out of view
                         const skillBars = entry.target.querySelectorAll('.skill-bar-fg');
                         skillBars.forEach(bar => {
                             bar.style.width = '0%';
@@ -373,10 +493,58 @@
                     }
                 });
             }, {
-                threshold: 0.1 // Trigger when 10% of the element is visible
+                threshold: 0.1
             });
             
             document.querySelectorAll('.anim-container').forEach(el => observer.observe(el));
+
+            // Custom Cursor & Spotlight Logic
+            const cursorDot = document.querySelector('.cursor-dot');
+            const interactiveElements = document.querySelectorAll('a, button, .bento-item, .cursor-pointer');
+
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX;
+                const posY = e.clientY;
+
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+
+                document.documentElement.style.setProperty('--x', `${posX}px`);
+                document.documentElement.style.setProperty('--y', `${posY}px`);
+            });
+
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorDot.classList.add('grow');
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursorDot.classList.remove('grow');
+                });
+            });
+
+            // Certificate Modal Logic
+            const modalContainer = document.getElementById('modal-container');
+            const modalImage = document.getElementById('modal-image');
+            const certificateImages = document.querySelectorAll('#certificate-gallery img');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            certificateImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    modalImage.src = img.src;
+                    modalContainer.classList.add('visible');
+                });
+            });
+
+            const closeModal = () => {
+                modalContainer.classList.remove('visible');
+            };
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalContainer.addEventListener('click', (e) => {
+                if (e.target === modalContainer) {
+                    closeModal();
+                }
+            });
         });
     </script>
 
